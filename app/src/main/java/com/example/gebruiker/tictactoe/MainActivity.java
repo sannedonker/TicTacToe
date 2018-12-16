@@ -1,5 +1,7 @@
 package com.example.gebruiker.tictactoe;
 
+import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,19 +35,16 @@ public class MainActivity extends AppCompatActivity {
 
             // retrieves the won message and disables the buttons if necessary
             ((TextView) findViewById(R.id.end_game)).setText(savedInstanceState.getCharSequence("end_game"));
-            if (savedInstanceState.getCharSequence("end_game") == "IT'S A DRAW!"
-                || savedInstanceState.getCharSequence("end_game") == "CONGRATULATIONS PLAYER ONE!"
-                || savedInstanceState.getCharSequence("end_game") == "CONGRATULATIONS PLAYER TWO!"){
+            if (savedInstanceState.getCharSequence("end_game") == "PLAYER ONE WINS" ||
+                savedInstanceState.getCharSequence("end_game") == "PLAYER TWO WINS" ||
+                savedInstanceState.getCharSequence("end_game") == "IT'S A DRAW") {
                 buttonsOff();
             }
-//            // TODO dit is mooier maar werkt niet --> later nog naar kijken!
-//            if (savedInstanceState.getCharSequence("end_game") != "") {
-//                buttonsOff();
-//            }
 
             // retrieves all the button figures
             for (int i = 0; i < buttons.length; i++) {
                 ((TextView) findViewById(buttons[i])).setText(savedInstanceState.getCharSequence(buttons_id[i]));
+
             }
         }
     }
@@ -85,31 +84,38 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-        // puts the correct figure on the button
+        // puts the correct figure in the correct color on the button
         switch (state) {
             case CROSS:
                 ((TextView) findViewById(id)).setText("X");
+//                ((TextView) findViewById(id)).setTextColor(getResources().getColor(R.color.red_cross));
+                ((TextView) findViewById(R.id.end_game)).setText("player two it's your turn to pick a tile");
                 break;
             case CIRCLE:
                 ((TextView) findViewById(id)).setText("O");
+//                ((TextView) findViewById(id)).setTextColor(getResources().getColor(R.color.blue_circle));
+                ((TextView) findViewById(R.id.end_game)).setText("player one it's your turn to pick a tile");
                 break;
             case INVALID:
-                break;
+                String player = ((TextView) findViewById(R.id.end_game)).getText().toString();
+                ((TextView) findViewById(R.id.end_game)).setText("try another tile " + player.substring(0, 10));
         }
 
         // checks if the game is won, returns an appropriate win message and disables the buttons if won
         GameState won = game.won();
         switch (won) {
             case PLAYER_ONE:
-                ((TextView) findViewById(R.id.end_game)).setText("CONGRATULATIONS PLAYER ONE!");
+                ((TextView) findViewById(R.id.end_game)).setText("PLAYER ONE WINS");
+                ((TextView) findViewById(R.id.end_game)).setTextColor(getResources().getColor(R.color.red_cross));
                 buttonsOff();
                 break;
             case PLAYER_TWO:
-                ((TextView) findViewById(R.id.end_game)).setText("CONGRATULATIONS PLAYER TWO!");
+                ((TextView) findViewById(R.id.end_game)).setText("PLAYER TWO WINS");
+                ((TextView) findViewById(R.id.end_game)).setTextColor(getResources().getColor(R.color.blue_circle));
                 buttonsOff();
                 break;
             case DRAW:
-                ((TextView) findViewById(R.id.end_game)).setText("IT'S A DRAW!");
+                ((TextView) findViewById(R.id.end_game)).setText("IT'S A DRAW");
                 buttonsOff();
                 break;
             case IN_PROGRESS:
@@ -131,9 +137,12 @@ public class MainActivity extends AppCompatActivity {
             ((TextView) findViewById(buttons[i])).setText(" ");
             findViewById(buttons[i]).setEnabled(true);
         }
-        ((TextView) findViewById(R.id.end_game)).setText("");
+        ((TextView) findViewById(R.id.end_game)).setText("player one it's your turn to pick a tile");
+        ((TextView) findViewById(R.id.end_game)).setTextColor(Color.rgb(00, 00,00));
+
     }
 
+    // save tilestates when phone is rotated
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
